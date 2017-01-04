@@ -4,6 +4,13 @@ package;
  * ...
  * @author Urs Stutz
  */
+typedef Car = {
+	var name:String;
+	var horsepower:Int;
+	var dollar_value:Int;
+	var in_stock:Bool;
+}
+
 class Main {
 	
 	static function compose2<A,B,C>( f:B->C, g:A->B ):A->C 									{ return function( x:A ) return f( g( x )); }
@@ -18,8 +25,29 @@ class Main {
 		return x;
 	}
 		
+	static function id<A>( x:A ):A {
+		return x;
+	}
+	
+	static function head<A>( x:Array<A> ):A {
+		return x[0];
+	}
+	
+	static function last<A>( x:Array<A> ):A {
+		return x[x.length - 1];
+	}
+	
+	static function prop<A>( p:String, obj:A ):Any {
+		return Reflect.getProperty( obj, p );
+	}
 	
 	static function main() {
+		
+		examples();
+		exercises();
+	}
+	
+	static function examples():Void {
 		
 		////////////////////////////////////////////////////////////////////////
 		// Functional husbandry
@@ -116,5 +144,68 @@ class Main {
 		
 		trace( dasherize('The world is a vampire'));
 		
+		
+		
+		
+		
+		
+		////////////////////////////////////////////////////////////////////////
+		// Category theory
+		
+		var g = function( x:String ):Int {
+			return x.length;
+		}
+		
+		var f = function( x:Int ):Bool {
+			return x == 4;
+		}
+		
+		var isFourLetterWord = compose2( f, g );
+		
+		trace( "isFourLetterWord( 'Hello' ): " + isFourLetterWord( 'Hello' ));
 	}
+	
+	
+	
+	static function exercises():Void {
+		
+		// Example Data
+		var c1:Car = { name: "Ferrari FF", horsepower: 660, dollar_value: 700000, in_stock: true };
+		var c2:Car = { name: "Spyker C12 Zagato", horsepower: 650, dollar_value: 648000, in_stock: false };
+		var c3:Car = { name: "Jaguar XKR-S", horsepower: 550, dollar_value: 132000, in_stock: false };
+		var c4:Car = { name: "Audi R8", horsepower: 525, dollar_value: 114200, in_stock: false };
+		var c5:Car = { name: "Aston Martin One-77", horsepower: 750, dollar_value: 1850000, in_stock: true };
+		var c6:Car = { name: "Pagani Huayra", horsepower: 700, dollar_value: 1300000, in_stock: false };
+		
+		var cars = [ c1, c2, c3, c4, c5, c6 ];
+		
+		
+		// Exercise 1:
+		// ============
+		// Use _.compose() to rewrite the function below. Hint: _.prop() is curried.
+		var isLastInStock = compose2( prop.bind( 'name', _ ), last );
+		
+		trace( "isLastInStock( cars ): " + isLastInStock( cars ));
+		
+		// Exercise 2:
+		// ============
+		// Use _.compose(), _.prop() and _.head() to retrieve the name of the first car.
+		var nameOfFirstCar = compose2( prop.bind( 'name', _ ), head );
+		
+		trace( "nameOfFirstCar( cars ): " + nameOfFirstCar( cars ));
+		
+		// Exercise 3:
+		// ============
+		// Use the helper function _average to refactor averageDollarValue as a composition.
+		var add = function( a:Float, b:Float ):Float { return a + b; }
+		var average = function( xs:List<Dynamic> ):Float {
+			return Lambda.fold( xs, add.bind( _, _ ), 0 ) / xs.length;
+		}
+		
+		var averageDollarValue = compose2( average.bind( _ ), Lambda.map.bind( _, prop.bind( 'dollar_value', _ )));
+		
+		trace( "averageDollarValue( cars ): " + averageDollarValue( cars ));
+	}
+	
 }
+
