@@ -106,13 +106,15 @@ class Main {
 		////////////////////////////////////////////////////////////////////////
 		// Debugging
 		
-		//var latin = compose2( Lambda.map.bind( _, shout ),  reverse );
+		var latin = compose2( Lambda.map.bind( _, shout ),  reverse );
 		
-		//trace( "latin( ['frog', 'eyes'] ): " + latin( ['frog', 'eyes'] ));
+		trace( "latin( ['frog', 'eyes'] ): " + latin( ['frog', 'eyes'] ));
 		
 		
 		
-		//var dasherize = compose5( join.bind( _, '-'), toLowerCase.bind( _ ), ftrace.bind('after split', _), split.bind( _, ' ' ), replace.bind( ~/\s{2,}/ig, ' ', _ ));
+		var dasherize = compose5( join.bind( _, '-'), Lambda.map.bind( _, toLowerCase.bind( _ )), ftrace.bind('after split', _), split.bind( _, ' ' ), replace.bind( ~/\s{2,}/ig, ' ', _ ));
+		
+		trace( dasherize('The world is a vampire'));
 		
 	}
 }
