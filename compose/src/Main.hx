@@ -11,9 +11,9 @@ class Main {
 	static function compose4<A,B,C,D,E>( f:D->E, g:C->D, h:B->C, i:A->B ):A->E 				{ return function( x:A ) return f( g( h( i( x )))); }
 	static function compose5<A,B,C,D,E,F>( f:E->F, g:D->E, h:C->D, i:B->C, j:A->B ):A->F 	{ return function( x:A ) return f( g( h( i( j( x ))))); }
 	
-	static function join<A>( array:Array<A>, sep:String ):String 							{ return array.join( sep ); }
+	static function join<A>( list:List<A>, sep:String ):String 								{ return list.join( sep ); }
 	
-	static function  ftrace<A,B>( tag:A, x:B ):B {
+	static function ftrace<A,B>( tag:A, x:B ):B {
 		trace( tag, x );
 		return x;
 	}
@@ -90,12 +90,18 @@ class Main {
 		trace( "snakeCase( 'Send in the Clowns' ): " + snakeCase( 'Send in the Clowns' ));
 		
 		
-		//var stringHead = function( str:String ):String { return str.substr( 0 ); }
-		//var split = function( str:String, splitter:String ):Array<String> { return str.split( splitter ); }
+		var stringHead = function( str:String ):String { return str.substr( 0, 1 ); }
+		var split = function( str:String, splitter:String ):Array<String> { return str.split( splitter ); }
 		
-		//var initials = compose3( join.bind( _, '. '), Lambda.map.bind( _, compose2(toUpperCase, head)), split.bind( _, ' '));
 		
-		//trace( "initials( 'hunter stockton thompson' ): " + initials( 'hunter stockton thompson' ));
+		var initials = compose3( join.bind( _, '. '), Lambda.map.bind( _, compose2(toUpperCase, stringHead)), split.bind( _, ' '));
+		
+		trace( "initials( 'hunter stockton thompson' ): " + initials( 'hunter stockton thompson' ));
+		
+		
+		
+		
+		
 		
 		////////////////////////////////////////////////////////////////////////
 		// Debugging
