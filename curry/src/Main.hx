@@ -52,7 +52,9 @@ class Main {
 		//==============
 		// Refactor to remove all arguments by partially applying the function.
 		
-		var words = function( str:String ):Array<String> return str.split( ' ' );
+		var words = function( str:String ):Array<String> { 
+			return str.split( ' ' );
+		}
 		
 		trace( "words( 'alpha beta gamma delta' ): " + words( 'alpha beta gamma delta' ));
 		
@@ -96,7 +98,9 @@ class Main {
 		// wrap array's slice to be functional and curried.
 		// //[1,2,3].slice(0, 2)
 		
-		var slice = function( start:Int, end:Int, xs:Array<Int> ):Array<Int> return xs.slice( start, end );
+		var slice = function( start:Int, end:Int, xs:Array<Int> ):Array<Int> {
+			return xs.slice( start, end );
+		}
 		
 		trace( 'slice( 1, 3, [0, 1, 2, 3, 4, 5, 6] ): ' + slice( 1, 3, [0, 1, 2, 3, 4, 5, 6] ));
 
@@ -107,7 +111,10 @@ class Main {
 		// Use slice to define a function "take" that takes n elements from the beginning of the string. Make it curried.
 		// // Result for "Something" with n=4 should be "Some"
 
-		var stringSlice = function( start:Int, end:Int, xs:String ):String return xs.substr( start, end );
+		var stringSlice = function( start:Int, end:Int, xs:String ):String {
+			return xs.substr( start, end );
+		}
+		
 		var take = stringSlice.bind( 0, _, _ );
 		
 		trace( "take( 4, 'Something' ): " + take( 4, 'Something' ));
