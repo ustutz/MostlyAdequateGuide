@@ -44,22 +44,21 @@ class Main {
 	
 	function new() {
 		
-		var mediaUrl = Ramda.compose2( Ramda.prop.bind( 'm', _ ), Ramda.prop.bind( 'media', _ ));
+		// trace json
+		//var app = Ramda.compose2( Impure.getJSON.bind( ftrace.bind( 'response', _ ), _ ), url );
 		
-		var srcs = Ramda.compose3( Lambda.map.bind( _, mediaUrl ), makeIterable, Ramda.prop.bind( 'items', _ ));
+		
+		var mediaUrl = Ramda.compose2( Ramda.prop.bind( 'm' ), Ramda.prop.bind( 'media' ));
+		
+		var srcs = Ramda.compose3( Lambda.map.bind( _, mediaUrl ), makeIterable, Ramda.prop.bind( 'items' ));
 		
 		var images = Ramda.compose2( Lambda.map.bind( _, img ), srcs );
 		
 		////////////////////////////////////////////
 		// Impure
 		
-		var renderImages = Ramda.compose2( Impure.appendElements.bind( 'body', _ ), images );
-		
-		// trace json
-		//var app = Ramda.compose2( Impure.getJSON.bind( ftrace.bind( 'response', _ ), _ ), url );
-		
-		
-		var app = Ramda.compose2( Impure.getJSON.bind( renderImages, _ ), url );
+		var renderImages = Ramda.compose2( Impure.appendElements.bind( 'body' ), images );
+		var app = Ramda.compose2( Impure.getJSON.bind( renderImages ), url );
 		
 		app( 'cats' );
 		
