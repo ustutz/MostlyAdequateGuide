@@ -1,4 +1,5 @@
 package;
+import js.html.Element;
 import js.jquery.JQuery;
 
 /**
@@ -11,8 +12,10 @@ class Impure {
 		JQuery.getJSON( url, callback );
 	}
 	
-	public static function setHTML( sel:String, html:String ):Void {
-		new JQuery( sel ).html( html );
+	public static function appendElements( sel:String, elements:List<Element> ):Void {
+		for( element in elements ) {
+			new JQuery( sel ).append( element );
+		}
 	}
 	
 }
