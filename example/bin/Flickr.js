@@ -69,21 +69,18 @@ _$List_ListIterator.prototype = {
 	}
 };
 var Main = function() {
-	var f = Ramda.compose2(function(a1) {
+	var f = Ramda.compose2($bind(this,this.img),Ramda.compose2(function(a1) {
 		return Ramda.prop("m",a1);
 	},function(a11) {
 		return Ramda.prop("media",a11);
-	});
-	var f1 = $bind(this,this.img);
+	}));
 	var a12 = Ramda.compose2(function(a2) {
 		Impure.appendElements("body",a2);
 	},Ramda.compose2(function(it) {
-		return Lambda.map(it,f1);
-	},Ramda.compose3(function(it1) {
-		return Lambda.map(it1,f);
-	},$bind(this,this.makeIterable),function(a13) {
+		return Lambda.map(it,f);
+	},function(a13) {
 		return Ramda.prop("items",a13);
-	})));
+	}));
 	(Ramda.compose2(function(a21) {
 		Impure.getJSON(a12,a21);
 	},$bind(this,this.url)))("cats");

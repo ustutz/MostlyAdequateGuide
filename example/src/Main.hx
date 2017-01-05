@@ -50,9 +50,16 @@ class Main {
 		
 		var mediaUrl = Ramda.compose2( Ramda.prop.bind( 'm' ), Ramda.prop.bind( 'media' ));
 		
-		var srcs = Ramda.compose3( Lambda.map.bind( _, mediaUrl ), makeIterable, Ramda.prop.bind( 'items' ));
 		
-		var images = Ramda.compose2( Lambda.map.bind( _, img ), srcs );
+		// unoptimized first version
+		//var srcs = Ramda.compose3( Lambda.map.bind( _, mediaUrl ), makeIterable, Ramda.prop.bind( 'items' ));
+		//var images = Ramda.compose2( Lambda.map.bind( _, img ), srcs );
+
+		
+		// optimized second version
+		var mediaToImg = Ramda.compose2( img, mediaUrl );
+		
+		var images = Ramda.compose2( Lambda.map.bind( _, mediaToImg ), Ramda.prop.bind( 'items' ));
 		
 		////////////////////////////////////////////
 		// Impure
