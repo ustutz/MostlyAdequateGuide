@@ -1,6 +1,7 @@
 package;
 import haxe.ds.ArraySort;
 import haxe.ds.ListSort;
+import haxe.ds.Vector;
 
 /**
  * ...
@@ -60,12 +61,17 @@ class Main {
 	}
 	
 	static function sortBy<A>( array:Array<A>, f:A->Float ):Array<A> {
-		ArraySort.sort( array, function(a, b):Int {
+		var v = new Vector<A>( array.length );
+		for ( i in 0...array.length ) {
+			v[i] = array[i];
+		}
+		var arrayCopy = v.toArray();
+		ArraySort.sort( arrayCopy, function(a, b):Int {
 		  if ( f( a ) < f( b )) return -1;
 		  else if ( f( a ) > f( b )) return 1;
 		  return 0;
 		});
-		return array;
+		return arrayCopy;
 	}
 	
 	static function main() {
