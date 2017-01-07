@@ -172,15 +172,23 @@ class Main {
 	////////////////////////////////////////////
 	// Pure Error Handling
 	
-	static function either( f, g, e ) {
+	static function either<A,B,C>( f:A->C, g:B->C, e:Dynamic ):C {
+		
 		switch( Type.getClass( e )) {
 			case Left:
 				return f( e.value );
 			case Right:
 				return g( e.value );
-			case _:
-				return null;
 		}
+		return null;
+	}
+	
+	static function id<A>( x:A ):A {
+		return x;
+	}
+	
+	static function ttrace<A>( x:A ):Void {
+		trace( x );
 	}
 	
 	static function pureErrorHandling():Void {
@@ -225,16 +233,14 @@ class Main {
 			
 		}
 		
-		var user1 = new User( '2005-12-12' );
 		trace(
 			"getAge( 2005-12-12 ):\n" +
-			getAge( Date.now(), user1 )
+			getAge( Date.now(), new User( '2005-12-12' ))
 		);
 		
-		var user2 = new User( '20010704' );
 		trace(
 			"getAge( 20010704 ):\n" +
-			getAge( Date.now(), user2 )
+			getAge( Date.now(), new User( '20010704' ))
 		);
 		
 		
@@ -247,11 +253,24 @@ class Main {
 		
 		trace(
 			"zoltar '2005-12-12':\n" +
-			zoltar( user1 )
+			zoltar( new User( '2005-12-12' ))
 		);
 		trace(
 			"zoltar 'balloons!':\n" +
 			zoltar( new User( 'balloons!' ))
 		);
+		
+		
+		
+		
+		
+		var zoltar2 = Ramda.compose3( ttrace, either.bind( id, fortune ), getAge.bind( Date.now() ));
+		
+		trace( "zoltar2 '2005-12-12':" );
+		zoltar2( new User( '2005-12-12' ));
+		
+		trace( "zoltar2 'balloons!':" );
+		zoltar2( new User( 'balloons!' ));
+		
 	}
 }
