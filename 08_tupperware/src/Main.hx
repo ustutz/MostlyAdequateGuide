@@ -273,4 +273,5 @@ class Main {
 		zoltar2( new User( 'balloons!' ));
 		
 	}
+	
 }

@@ -11,6 +11,7 @@ class Ramda {
 		return v1 + v2;
 	}
 	
+	public static function compose1<A>( f, g ) 								{ return function() return f( g()); }
 	public static function compose2<A,B,C>( f:B->C, g:A->B ):A->C 									{ return function( x:A ) return f( g( x )); }
 	public static function compose3<A,B,C,D>( f:C->D, g:B->C, h:A->B ):A->D 						{ return function( x:A ) return f( g( h( x ))); }
 	public static function compose4<A,B,C,D,E>( f:D->E, g:C->D, h:B->C, i:A->B ):A->E 				{ return function( x:A ) return f( g( h( i( x )))); }
