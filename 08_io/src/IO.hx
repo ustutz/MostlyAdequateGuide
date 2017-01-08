@@ -18,8 +18,9 @@ class IO<A> {
 		this.value = f;
 	}
 	
-	public function map<A,B>( f ) {
+	public function map<E>( f:Dynamic ):IO<Void->A> {
 		return new IO( Ramda.compose1( f, value ));
 	}
+	
 	
 }
