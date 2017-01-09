@@ -27,7 +27,7 @@ EReg.prototype = {
 	,__class__: EReg
 };
 var IO = function(f) {
-	this.value = f;
+	this.unsafePerformIO = f;
 };
 IO.__name__ = true;
 IO.of = function(x) {
@@ -37,15 +37,67 @@ IO.of = function(x) {
 };
 IO.prototype = {
 	map: function(f) {
-		return new IO(Ramda.compose1(f,this.value));
+		return new IO(Ramda.compose1(f,this.unsafePerformIO));
 	}
 	,__class__: IO
+};
+var Lambda = function() { };
+Lambda.__name__ = true;
+Lambda.map = function(it,f) {
+	var l = new List();
+	var x = it.iterator();
+	while(x.hasNext()) l.add(f(x.next()));
+	return l;
+};
+var List = function() {
+	this.length = 0;
+};
+List.__name__ = true;
+List.prototype = {
+	add: function(item) {
+		var x = new _$List_ListNode(item,null);
+		if(this.h == null) {
+			this.h = x;
+		} else {
+			this.q.next = x;
+		}
+		this.q = x;
+		this.length++;
+	}
+	,iterator: function() {
+		return new _$List_ListIterator(this.h);
+	}
+	,__class__: List
+};
+var _$List_ListNode = function(item,next) {
+	this.item = item;
+	this.next = next;
+};
+_$List_ListNode.__name__ = true;
+_$List_ListNode.prototype = {
+	__class__: _$List_ListNode
+};
+var _$List_ListIterator = function(head) {
+	this.head = head;
+};
+_$List_ListIterator.__name__ = true;
+_$List_ListIterator.prototype = {
+	hasNext: function() {
+		return this.head != null;
+	}
+	,next: function() {
+		var val = this.head.item;
+		this.head = this.head.next;
+		return val;
+	}
+	,__class__: _$List_ListIterator
 };
 var Main = function() { };
 Main.__name__ = true;
 Main.main = function() {
 	Main.localStorage();
 	Main.ioExample();
+	Main.paramsExample();
 };
 Main.localStorage = function() {
 	var localStorage = [];
@@ -67,26 +119,93 @@ Main.head = function(x) {
 };
 Main.ioExample = function() {
 	var io_window = IO.of(window);
-	console.log(io_window.value());
+	console.log(io_window.unsafePerformIO());
 	console.log(io_window.map(function(win) {
 		return win.innerWidth;
-	}).value());
+	}).unsafePerformIO());
 	console.log(io_window.map(function(a1) {
 		return Ramda.prop("location",a1);
 	}).map(function(a11) {
 		return Ramda.prop("href",a11);
 	}).map(function(a2) {
 		return Ramda.split("/",a2);
-	}).value());
+	}).unsafePerformIO());
 	console.log((function(selector) {
 		return new IO(function() {
 			return window.document.querySelectorAll(selector);
 		});
 	})("#myDiv").map(Main.head).map(function(div) {
 		return div.innerHTML;
-	}).value());
+	}).unsafePerformIO());
+};
+Main.last = function(x) {
+	return x[x.length - 1];
+};
+Main.paramsExample = function() {
+	var url = IO.of("http://localhost:2000/index.html?wafflehouse=sweet&t=hs&ia=web");
+	var f = function(a2) {
+		return Ramda.split("=",a2);
+	};
+	var toPairs = Ramda.compose2(function(a1) {
+		return Ramda.map(f,a1);
+	},function(a21) {
+		return Ramda.split("&",a21);
+	});
+	var params = Ramda.compose3(toPairs,Main.last,function(a22) {
+		return Ramda.split("?",a22);
+	});
+	var findParam = function(key) {
+		var v1 = key;
+		var a11 = Ramda.compose2(function(v2) {
+			return Ramda.eq(v1,v2);
+		},Main.head);
+		return Ramda.map(Ramda.compose3(Maybe.of,function(a23) {
+			return Ramda.filter(a11,a23);
+		},params),url);
+	};
+	console.log("url.unsafePerformIO(): " + url.unsafePerformIO());
+	console.log("toPairs(...): " + Std.string(toPairs("http://localhost:2000/index.html?wafflehouse=sweet&t=hs&ia=web")));
+	console.log("params(...): " + Std.string(params("http://localhost:2000/index.html?wafflehouse=sweet&t=hs&ia=web")));
+	console.log("headParamsCompose( testUrl ): " + Std.string((Ramda.compose2(Main.head,params))("http://localhost:2000/index.html?wafflehouse=sweet&t=hs&ia=web")));
+	var headEqWafflehouseCompose = Ramda.compose2(function(v21) {
+		return Ramda.eq("wafflehouse",v21);
+	},Main.head);
+	console.log("headEqWafflehouseCompose( testParams1 ): " + Std.string(headEqWafflehouseCompose(["wafflehouse","wafflehouse"])));
+	console.log("headEqWafflehouseCompose( testParams2 ): " + Std.string(headEqWafflehouseCompose(["t","hs"])));
+	console.log("headEqWafflehouseCompose( testParams3 ): " + Std.string(headEqWafflehouseCompose(["ia","web"])));
+	var filterUrl = Ramda.filter(headEqWafflehouseCompose,params("http://localhost:2000/index.html?wafflehouse=sweet&t=hs&ia=web"));
+	console.log("filter: " + Std.string(filterUrl));
+	console.log("Maybe.of( filterUrl ): " + Std.string(Maybe.of(filterUrl)));
+	var v11 = "wafflehouse";
+	var a12 = Ramda.compose2(function(v22) {
+		return Ramda.eq(v11,v22);
+	},Main.head);
+	console.log("maybeCompose( testUrl ): " + Std.string((Ramda.compose3(Maybe.of,function(a24) {
+		return Ramda.filter(a12,a24);
+	},params))("http://localhost:2000/index.html?wafflehouse=sweet&t=hs&ia=web")));
+	console.log("findParam( 'searchTerm' ).unsafePerformIO(): " + Std.string(findParam("searchTerm").unsafePerformIO()));
 };
 Math.__name__ = true;
+var Maybe = function(x) {
+	this.value = x;
+};
+Maybe.__name__ = true;
+Maybe.of = function(x) {
+	return new Maybe(x);
+};
+Maybe.prototype = {
+	isNothing: function() {
+		return this.value == null;
+	}
+	,map: function(f) {
+		if(this.isNothing()) {
+			return Maybe.of(null);
+		} else {
+			return Maybe.of(f(this.value));
+		}
+	}
+	,__class__: Maybe
+};
 var Ramda = function() { };
 Ramda.__name__ = true;
 Ramda.add = function(v1,v2) {
@@ -131,16 +250,28 @@ Ramda.compose5 = function(f,g,h,i,j) {
 Ramda.sconcat = function(s1,s2) {
 	return s1 + s2;
 };
-Ramda.map = function(f,list) {
-	var length = list.length;
-	var v = new Array(length);
-	var _g1 = 0;
-	var _g = list.length;
-	while(_g1 < _g) {
-		var i = _g1++;
-		v[i] = f(list[i]);
+Ramda.eq = function(v1,v2) {
+	return v1 == v2;
+};
+Ramda.filter = function(pred,filterable) {
+	var a = [];
+	var _g = 0;
+	while(_g < filterable.length) {
+		var x = filterable[_g];
+		++_g;
+		if(pred(x)) {
+			a.push(x);
+		}
 	}
-	return v.slice(0);
+	return a;
+};
+Ramda.map = function(f,list) {
+	console.log(f);
+	console.log(list);
+	if(list.map != null) {
+		return list.map(f);
+	}
+	return Lambda.map(list,f);
 };
 Ramda.match = function(rx,str) {
 	var matches = [];
@@ -199,6 +330,11 @@ Ramda.prop = function(p,obj) {
 Ramda.split = function(sep,str) {
 	return str.split(sep);
 };
+var Std = function() { };
+Std.__name__ = true;
+Std.string = function(s) {
+	return js_Boot.__string_rec(s,"");
+};
 var js__$Boot_HaxeError = function(val) {
 	Error.call(this);
 	this.val = val;
@@ -234,6 +370,90 @@ js_Boot.getClass = function(o) {
 			return js_Boot.__resolveNativeClass(name);
 		}
 		return null;
+	}
+};
+js_Boot.__string_rec = function(o,s) {
+	if(o == null) {
+		return "null";
+	}
+	if(s.length >= 5) {
+		return "<...>";
+	}
+	var t = typeof(o);
+	if(t == "function" && (o.__name__ || o.__ename__)) {
+		t = "object";
+	}
+	switch(t) {
+	case "function":
+		return "<function>";
+	case "object":
+		if(o instanceof Array) {
+			if(o.__enum__) {
+				if(o.length == 2) {
+					return o[0];
+				}
+				var str = o[0] + "(";
+				s += "\t";
+				var _g1 = 2;
+				var _g = o.length;
+				while(_g1 < _g) {
+					var i = _g1++;
+					if(i != 2) {
+						str += "," + js_Boot.__string_rec(o[i],s);
+					} else {
+						str += js_Boot.__string_rec(o[i],s);
+					}
+				}
+				return str + ")";
+			}
+			var l = o.length;
+			var i1;
+			var str1 = "[";
+			s += "\t";
+			var _g11 = 0;
+			var _g2 = l;
+			while(_g11 < _g2) {
+				var i2 = _g11++;
+				str1 += (i2 > 0 ? "," : "") + js_Boot.__string_rec(o[i2],s);
+			}
+			str1 += "]";
+			return str1;
+		}
+		var tostr;
+		try {
+			tostr = o.toString;
+		} catch( e ) {
+			return "???";
+		}
+		if(tostr != null && tostr != Object.toString && typeof(tostr) == "function") {
+			var s2 = o.toString();
+			if(s2 != "[object Object]") {
+				return s2;
+			}
+		}
+		var k = null;
+		var str2 = "{\n";
+		s += "\t";
+		var hasp = o.hasOwnProperty != null;
+		for( var k in o ) {
+		if(hasp && !o.hasOwnProperty(k)) {
+			continue;
+		}
+		if(k == "prototype" || k == "__class__" || k == "__super__" || k == "__interfaces__" || k == "__properties__") {
+			continue;
+		}
+		if(str2.length != 2) {
+			str2 += ", \n";
+		}
+		str2 += s + k + " : " + js_Boot.__string_rec(o[k],s);
+		}
+		s = s.substring(1);
+		str2 += "\n" + s + "}";
+		return str2;
+	case "string":
+		return o;
+	default:
+		return String(o);
 	}
 };
 js_Boot.__interfLoop = function(cc,cl) {

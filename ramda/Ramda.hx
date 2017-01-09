@@ -22,11 +22,25 @@ class Ramda {
 		return s1 + s2;
 	}
 	
-	public static function map<A,B>( f:A->B, list:Array<A> ):Array<B> {
-		var v = new Vector<B>( list.length );
-		for ( i in 0...list.length )
-			v[i] = f( list[i] );
-		return v.toArray();
+	public static function eq<A>( v1:A, v2:A ):Bool {
+		return v1 == v2;
+	}
+	
+	public static function filter<A>( pred:A->Bool, filterable:Array<A> ) {
+		var a = new Array<A>();
+		for( x in filterable )
+			if( pred(x) )
+				a.push(x);
+		return a;
+	}
+	
+	public static function map<A,B>( f:A->B, list:Dynamic ):Dynamic {
+		trace( f );
+		trace( list );
+		if ( list.map != null ) {
+			return list.map( f );
+		}
+		return Lambda.map( list, f );
 	}
 	
 	public static function match( rx:EReg, str:String ):Array<String> {

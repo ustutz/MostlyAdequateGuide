@@ -6,7 +6,7 @@ package;
  */
 class IO<A> {
 	
-	public var value:Void->A;
+	public var unsafePerformIO:Void->A;
 
 	public static function of<A>( x:A ):IO<A> {
 		return new IO( function():A {
@@ -15,11 +15,11 @@ class IO<A> {
 	}
 	
 	public function new( f:Void->A ) {
-		this.value = f;
+		this.unsafePerformIO = f;
 	}
 	
-	public function map<E>( f:Dynamic ):IO<Void->A> {
-		return new IO( Ramda.compose1( f, value ));
+	public function map( f:Dynamic ):IO<Void->A> {
+		return new IO( Ramda.compose1( f, unsafePerformIO ));
 	}
 	
 	
