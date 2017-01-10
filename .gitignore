@@ -1,3 +1,4 @@
 *.n
 /08_tupperware/bin
 /js
+/00_tests/dump

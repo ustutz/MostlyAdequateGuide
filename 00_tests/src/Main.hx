@@ -10,6 +10,11 @@ class Main {
 	
 	static function main() {
 		
+		simple();
+	}
+	
+	static function simple():Void {
+		
 		var sayHello = function():String {
 			return "Hello";
 		}
@@ -38,5 +43,5 @@ class Main {
 		return f( x, y );
 	}
 	
-	
+
 }
